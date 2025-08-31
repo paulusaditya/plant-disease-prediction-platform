@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import { Progress } from "./ui/progress";
 import { Upload, Image, AlertTriangle, CheckCircle, Info } from "lucide-react";
 
@@ -12,8 +18,18 @@ export function PredictionSection() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const plantTypes = [
-    "Tomat", "Kentang", "Cabai", "Jagung", "Padi", "Kedelai", 
-    "Terung", "Timun", "Wortel", "Bayam", "Kangkung", "Selada"
+    "Tomat",
+    "Kentang",
+    "Cabai",
+    "Jagung",
+    "Padi",
+    "Kedelai",
+    "Terung",
+    "Timun",
+    "Wortel",
+    "Bayam",
+    "Kangkung",
+    "Selada",
   ];
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,53 +43,35 @@ export function PredictionSection() {
     }
   };
 
-  const handlePrediction = () => {
+  const handlePrediction = async () => {
     if (!selectedImage || !selectedPlant) return;
-    
+
     setIsAnalyzing(true);
-    
-    // Simulate AI analysis
-    setTimeout(() => {
-      const mockResults = [
-        {
-          disease: "Bercak Daun (Leaf Spot)",
-          confidence: 92,
-          severity: "Sedang",
-          severityColor: "bg-yellow-500",
-          description: "Penyakit jamur yang menyerang daun, ditandai dengan bercak-bercak coklat pada permukaan daun.",
-          treatment: [
-            "Buang dan musnahkan daun yang terinfeksi",
-            "Semprotkan fungisida berbahan aktif mankozeb",
-            "Tingkatkan sirkulasi udara di sekitar tanaman",
-            "Kurangi penyiraman pada daun, fokus ke akar"
-          ],
-          prevention: [
-            "Jaga kebersihan lahan dari sisa tanaman",
-            "Rotasi tanaman setiap musim",
-            "Gunakan mulsa untuk mengurangi percikan air ke daun"
-          ]
-        },
-        {
-          disease: "Sehat",
-          confidence: 87,
-          severity: "Normal",
-          severityColor: "bg-green-500",
-          description: "Tanaman dalam kondisi sehat dengan pertumbuhan normal.",
-          treatment: [
-            "Lanjutkan perawatan rutin",
-            "Pertahankan jadwal penyiraman yang konsisten",
-            "Berikan nutrisi sesuai fase pertumbuhan"
-          ],
-          prevention: [
-            "Monitor rutin kondisi tanaman",
-            "Jaga kebersihan area sekitar tanaman"
-          ]
-        }
-      ];
-      
-      setPredictionResult(mockResults[Math.floor(Math.random() * mockResults.length)]);
+
+    try {
+      const formData = new FormData();
+
+      // Ambil file asli dari input
+      const fileInput = document.getElementById(
+        "image-upload"
+      ) as HTMLInputElement;
+      if (fileInput?.files?.[0]) {
+        formData.append("image", fileInput.files[0]);
+      }
+      formData.append("plantType", selectedPlant.toLowerCase()); // contoh: tomato, corn
+
+      const res = await fetch("http://localhost:5000/api/predict", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      setPredictionResult(data);
+    } catch (error) {
+      console.error("Prediction failed:", error);
+    } finally {
       setIsAnalyzing(false);
-    }, 3000);
+    }
   };
 
   return (
@@ -84,7 +82,8 @@ export function PredictionSection() {
             Prediksi Penyakit Tanaman
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Unggah foto tanaman Anda dan biarkan AI memberikan diagnosis akurat dalam hitungan detik
+            Unggah foto tanaman Anda dan biarkan AI memberikan diagnosis akurat
+            dalam hitungan detik
           </p>
         </div>
 
@@ -102,7 +101,7 @@ export function PredictionSection() {
                     className="hidden"
                     id="image-upload"
                   />
-                  
+
                   {selectedImage ? (
                     <div className="space-y-4">
                       <img
@@ -120,15 +119,22 @@ export function PredictionSection() {
                       </div>
                     </div>
                   ) : (
-                    <label htmlFor="image-upload" className="cursor-pointer block">
+                    <label
+                      htmlFor="image-upload"
+                      className="cursor-pointer block"
+                    >
                       <Upload className="h-16 w-16 mx-auto mb-4 text-[#2E7D32]" />
                       <h3 className="text-xl font-semibold text-gray-900 mb-2">
                         Upload Foto Tanaman
                       </h3>
                       <p className="text-gray-600 mb-4">
-                        Seret dan lepas gambar di sini atau klik untuk memilih file
+                        Seret dan lepas gambar di sini atau klik untuk memilih
+                        file
                       </p>
-                      <Button variant="outline" className="border-[#2E7D32] text-[#2E7D32]">
+                      <Button
+                        variant="outline"
+                        className="border-[#2E7D32] text-[#2E7D32]"
+                      >
                         <Image className="mr-2 h-4 w-4" />
                         Pilih Gambar
                       </Button>
@@ -143,7 +149,10 @@ export function PredictionSection() {
                   <CardTitle className="text-lg">Pilih Jenis Tanaman</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Select value={selectedPlant} onValueChange={setSelectedPlant}>
+                  <Select
+                    value={selectedPlant}
+                    onValueChange={setSelectedPlant}
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Pilih jenis tanaman..." />
                     </SelectTrigger>
@@ -184,8 +193,12 @@ export function PredictionSection() {
                       <div className="animate-pulse bg-[#2E7D32] w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center">
                         <AlertTriangle className="h-8 w-8 text-white" />
                       </div>
-                      <h3 className="text-lg font-semibold mb-2">Sedang Menganalisis...</h3>
-                      <p className="text-gray-600 mb-4">AI sedang memeriksa kondisi tanaman Anda</p>
+                      <h3 className="text-lg font-semibold mb-2">
+                        Sedang Menganalisis...
+                      </h3>
+                      <p className="text-gray-600 mb-4">
+                        AI sedang memeriksa kondisi tanaman Anda
+                      </p>
                       <Progress value={75} className="w-full" />
                     </div>
                   </CardContent>
@@ -204,7 +217,7 @@ export function PredictionSection() {
                       Hasil Prediksi AI
                     </CardTitle>
                   </CardHeader>
-                  
+
                   <CardContent className="p-6 space-y-6">
                     {/* Disease Info */}
                     <div>
@@ -213,15 +226,19 @@ export function PredictionSection() {
                           {predictionResult.disease}
                         </h3>
                         <div className="text-right">
-                          <div className="text-sm text-gray-600">Tingkat Keyakinan</div>
+                          <div className="text-sm text-gray-600">
+                            Tingkat Keyakinan
+                          </div>
                           <div className="text-xl font-bold text-[#2E7D32]">
                             {predictionResult.confidence}%
                           </div>
                         </div>
                       </div>
-                      
-                      <p className="text-gray-600 mb-4">{predictionResult.description}</p>
-                      
+
+                      <p className="text-gray-600 mb-4">
+                        {predictionResult.description}
+                      </p>
+
                       {/* Severity Indicator */}
                       <div className="mb-6">
                         <div className="flex items-center justify-between mb-2">
@@ -235,10 +252,15 @@ export function PredictionSection() {
                         <div className="w-full bg-gray-200 rounded-full h-3">
                           <div
                             className={`h-3 rounded-full ${predictionResult.severityColor}`}
-                            style={{ 
-                              width: predictionResult.disease === "Sehat" ? "100%" : 
-                                     predictionResult.severity === "Ringan" ? "33%" :
-                                     predictionResult.severity === "Sedang" ? "66%" : "100%"
+                            style={{
+                              width:
+                                predictionResult.disease === "Sehat"
+                                  ? "100%"
+                                  : predictionResult.severity === "Ringan"
+                                  ? "33%"
+                                  : predictionResult.severity === "Sedang"
+                                  ? "66%"
+                                  : "100%",
                             }}
                           ></div>
                         </div>
@@ -252,14 +274,16 @@ export function PredictionSection() {
                         Saran Perawatan
                       </h4>
                       <ul className="space-y-2">
-                        {predictionResult.treatment.map((item: string, index: number) => (
-                          <li key={index} className="flex items-start">
-                            <div className="bg-[#2E7D32] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mr-3 mt-0.5 flex-shrink-0">
-                              {index + 1}
-                            </div>
-                            <span className="text-gray-700">{item}</span>
-                          </li>
-                        ))}
+                        {predictionResult.treatment.map(
+                          (item: string, index: number) => (
+                            <li key={index} className="flex items-start">
+                              <div className="bg-[#2E7D32] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mr-3 mt-0.5 flex-shrink-0">
+                                {index + 1}
+                              </div>
+                              <span className="text-gray-700">{item}</span>
+                            </li>
+                          )
+                        )}
                       </ul>
                     </div>
 
@@ -270,12 +294,14 @@ export function PredictionSection() {
                         Tips Pencegahan
                       </h4>
                       <ul className="space-y-2">
-                        {predictionResult.prevention.map((item: string, index: number) => (
-                          <li key={index} className="flex items-start">
-                            <CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                            <span className="text-gray-700">{item}</span>
-                          </li>
-                        ))}
+                        {predictionResult.prevention.map(
+                          (item: string, index: number) => (
+                            <li key={index} className="flex items-start">
+                              <CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+                              <span className="text-gray-700">{item}</span>
+                            </li>
+                          )
+                        )}
                       </ul>
                     </div>
                   </CardContent>
@@ -286,8 +312,13 @@ export function PredictionSection() {
                 <Card className="border-2 border-dashed border-gray-300">
                   <CardContent className="p-12 text-center text-gray-500">
                     <AlertTriangle className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                    <h3 className="text-xl font-semibold mb-2">Hasil Prediksi Akan Muncul Di Sini</h3>
-                    <p>Upload gambar dan pilih jenis tanaman untuk memulai analisis</p>
+                    <h3 className="text-xl font-semibold mb-2">
+                      Hasil Prediksi Akan Muncul Di Sini
+                    </h3>
+                    <p>
+                      Upload gambar dan pilih jenis tanaman untuk memulai
+                      analisis
+                    </p>
                   </CardContent>
                 </Card>
               )}
