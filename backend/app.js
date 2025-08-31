@@ -1,24 +1,12 @@
-import express from "express";
-import cors from "cors";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require('express');
+const cors = require('cors');
+const predictRoutes = require('./src/routes/predict');
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
-// Serve model folder
-app.use(
-  "/models/tomato",
-  express.static(path.join(__dirname, "../models/tomato/tomato_model_tfjs"))
-);
+app.use('/api/predict', predictRoutes);
 
-app.get("/", (req, res) => {
-  res.send("✅ Backend running, model available at /models/tomato/model.json");
-});
-
-app.listen(5000, () => {
-  console.log("🚀 Server running at http://localhost:5000");
-});
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`API running on port ${PORT}`));

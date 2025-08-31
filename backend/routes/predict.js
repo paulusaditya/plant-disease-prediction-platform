@@ -1,10 +1,15 @@
 const express = require('express');
 const multer = require('multer');
-const { predict } = require('../src/controllers/predictController');
+const path = require('path');
+const predictController = require('../controllers/predictController');
 
-const upload = multer({ dest: 'uploads/' });
 const router = express.Router();
 
-router.post('/predict', upload.single('image'), predict);
+const upload = multer({
+  dest: path.resolve(__dirname, '../../uploads'), // pastikan folder ada/terbuat
+  limits: { fileSize: 5 * 1024 * 1024 },         // 5MB
+});
+
+router.post('/:plant', upload.single('image'), predictController.predict);
 
 module.exports = router;

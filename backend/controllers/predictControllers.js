@@ -1,25 +1,30 @@
 const fs = require('fs');
-const TomatoStrategy = require('../strategies/TomatoStrategy');
-const RiceStrategy = require('../strategies/RiceStrategy');
-const CornStrategy = require('../strategies/CornStrategy');
-const PotatoStrategy = require('../strategies/PotatoStrategy');
-
-const strategies = {
-  tomato: new TomatoStrategy(),
-  rice: new RiceStrategy(),
-  corn: new CornStrategy(),
-  potato: new PotatoStrategy(),
-};
+const StrategyFactory = require('../strategies/StrategyFactory');
 
 exports.predict = async (req, res) => {
   try {
-    const { type } = req.body; // misal 'tomato', 'rice', ...
-    if (!strategies[type]) return res.status(400).json({ error: 'Invalid type' });
+    const { plant } = req.params;
+    if (!req.file) {
+      return res.status(400).json({ error: 'File image tidak ditemukan (field name: image)' });
+    }
+
+    const strategy = StrategyFactory.get(plant);
+    if (!strategy) {
+      return res.status(400).json({ error: `Plant "${plant}" belum didukung` });
+    }
 
     const imageBuffer = fs.readFileSync(req.file.path);
-    const result = await strategies[type].predict(imageBuffer);
+    const probs = await strategy.predict(imageBuffer);
+    const top = strategy.topK(probs, 3);
 
-    res.json({ result });
+    // (opsional) hapus file upload setelah dipakai
+    fs.unlink(req.file.path, () => {});
+
+    res.json({
+      plant,
+      top,          // 3 prediksi teratas
+      raw: probs,   // seluruh probabilitas
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Prediction failed' });
