@@ -23,3 +23,9 @@ build/
 # System
 .DS_Store
 Thumbs.db
+
+# Models
+*.h5
+*.hdf5
+*.pkl
+*.ckpt
