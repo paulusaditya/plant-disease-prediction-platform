@@ -32,6 +32,22 @@ export function PredictionSection() {
     "Selada",
   ];
 
+  // Mapping Indonesia -> Endpoint backend
+  const plantMap: Record<string, string> = {
+    Tomat: "tomat",
+    Kentang: "kentang",
+    Cabai: "chili",
+    Jagung: "jagung",
+    Padi: "rice",
+    Kedelai: "soybean",
+    Terung: "eggplant",
+    Timun: "cucumber",
+    Wortel: "carrot",
+    Bayam: "spinach",
+    Kangkung: "kale",
+    Selada: "lettuce",
+  };
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -44,31 +60,74 @@ export function PredictionSection() {
   };
 
   const handlePrediction = async () => {
-    if (!selectedImage || !selectedPlant) return;
+    if (!selectedImage || !selectedPlant) {
+      alert("Harap pilih gambar dan jenis tanaman terlebih dahulu!");
+      return;
+    }
 
     setIsAnalyzing(true);
 
     try {
       const formData = new FormData();
-
-      // Ambil file asli dari input
       const fileInput = document.getElementById(
         "image-upload"
       ) as HTMLInputElement;
-      if (fileInput?.files?.[0]) {
-        formData.append("image", fileInput.files[0]);
-      }
-      formData.append("plantType", selectedPlant.toLowerCase()); // contoh: tomato, corn
 
-      const res = await fetch("http://localhost:5000/api/predict", {
+      if (fileInput?.files?.[0]) {
+        formData.append("file", fileInput.files[0]); // backend expects "file"
+      } else {
+        alert("File gambar tidak ditemukan.");
+        setIsAnalyzing(false);
+        return;
+      }
+
+      const backendPlant = plantMap[selectedPlant];
+      if (!backendPlant) {
+        alert("Jenis tanaman belum didukung backend.");
+        setIsAnalyzing(false);
+        return;
+      }
+
+      const res = await fetch(`http://127.0.0.1:8000/predict/${backendPlant}`, {
         method: "POST",
         body: formData,
       });
 
+      if (!res.ok) throw new Error("Gagal melakukan request ke backend");
+
       const data = await res.json();
-      setPredictionResult(data);
+
+      // Format hasil untuk UI
+      setPredictionResult({
+        disease: data.class,
+        confidence: (data.confidence * 100).toFixed(2),
+        description: `Tanaman ${selectedPlant} terdeteksi ${data.class}`,
+        severity:
+          data.confidence > 0.8
+            ? "Parah"
+            : data.confidence > 0.5
+            ? "Sedang"
+            : "Ringan",
+        severityColor:
+          data.confidence > 0.8
+            ? "bg-red-500"
+            : data.confidence > 0.5
+            ? "bg-yellow-500"
+            : "bg-green-500",
+        treatment: [
+          "Gunakan fungisida sesuai dosis",
+          "Potong daun yang terinfeksi",
+          "Jaga kelembaban tanah",
+        ],
+        prevention: [
+          "Rotasi tanaman",
+          "Gunakan varietas tahan penyakit",
+          "Jaga jarak tanam",
+        ],
+      });
     } catch (error) {
       console.error("Prediction failed:", error);
+      alert("Terjadi kesalahan saat melakukan prediksi.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -119,10 +178,7 @@ export function PredictionSection() {
                       </div>
                     </div>
                   ) : (
-                    <label
-                      htmlFor="image-upload"
-                      className="cursor-pointer block"
-                    >
+                    <div>
                       <Upload className="h-16 w-16 mx-auto mb-4 text-[#2E7D32]" />
                       <h3 className="text-xl font-semibold text-gray-900 mb-2">
                         Upload Foto Tanaman
@@ -131,14 +187,14 @@ export function PredictionSection() {
                         Seret dan lepas gambar di sini atau klik untuk memilih
                         file
                       </p>
-                      <Button
-                        variant="outline"
-                        className="border-[#2E7D32] text-[#2E7D32]"
+                      <label
+                        htmlFor="image-upload"
+                        className="cursor-pointer inline-flex items-center bg-white border border-[#2E7D32] text-[#2E7D32] px-6 py-2 rounded-lg hover:bg-green-50 transition-colors"
                       >
                         <Image className="mr-2 h-4 w-4" />
                         Pilih Gambar
-                      </Button>
-                    </label>
+                      </label>
+                    </div>
                   )}
                 </CardContent>
               </Card>

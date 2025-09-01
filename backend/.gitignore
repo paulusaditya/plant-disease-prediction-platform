@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual env
+venv/
+.venv/
+env/
+ENV/
+
+# Flask instance
+instance/
+
+# Logs
+*.log
+
+# React/Node
+node_modules/
+dist/
+build/
+
+# System
+.DS_Store
+Thumbs.db
