@@ -1,34 +1,44 @@
+import os
+import cv2
 import numpy as np
-from tensorflow.keras.preprocessing import image
+import tensorflow as tf
 from tensorflow.keras.models import load_model
-import io
-from PIL import Image
+from tensorflow.keras.applications.efficientnet import preprocess_input
 
 class TomatoStrategy:
     def __init__(self):
         self.model = load_model("app/models/efficientnetb3-TomKit-97.94.h5")
         self.class_names = [
-            "Tomato_Bacterial_spot",
-            "Tomato_Early_blight",
-            "Tomato_Late_blight",
-            "Tomato_Leaf_Mold",
-            "Tomato_Septoria_leaf_spot",
-            "Tomato_Spider_mites",
-            "Tomato_Target_Spot",
-            "Tomato_YellowLeaf_Curl_Virus",
-            "Tomato_mosaic_virus",
-            "Tomato_healthy"
+            "Bacterial_spot",
+            "Early_blight",
+            "Healthy",
+            "Late_blight",
+            "Leaf_mold",
+            "Mosaic_virus",
+            "Septoria_leaf_spot",
+            "Spider_mites",
+            "Target_spot",
+            "Yellow_leaf_curl_virus",
         ]
+
+    def preprocess_image(self, img_bytes):
+        # Convert bytes ke numpy array
+        nparr = np.frombuffer(img_bytes, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        if img is None:
+            raise ValueError("Gambar tidak valid")
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.resize(img, self.model.input_shape[1:3])
+        img = np.expand_dims(img, axis=0)
+        img = preprocess_input(img)  # Sesuai EfficientNet
+        return img
 
     def predict(self, file):
         img_bytes = file.file.read()
-        img = Image.open(io.BytesIO(img_bytes)).resize((256, 256))
+        img_array = self.preprocess_image(img_bytes)
 
-        img_array = image.img_to_array(img) / 255.0
-        img_array = np.expand_dims(img_array, axis=0)
-
-        preds = self.model.predict(img_array)
-        class_idx = np.argmax(preds)
+        preds = self.model.predict(img_array, verbose=0)
+        class_idx = np.argmax(preds, axis=1)[0]
         confidence = float(np.max(preds))
 
         return {

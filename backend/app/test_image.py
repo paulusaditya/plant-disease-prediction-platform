@@ -55,5 +55,5 @@ def predict_tomato_disease(img_path: str):
 
 # --- Contoh penggunaan ---
 if __name__ == "__main__":
-    IMG_PATH = r"C:\Users\Aditya\Documents\SEMESTER 7\skripsi-project\plant-disease-prediction-platform\backend\app\img\download.jpeg"
+    IMG_PATH = r"C:\Users\Aditya\Documents\SEMESTER 7\skripsi-project\plant-disease-prediction-platform\backend\app\img\sehat.jpeg"
     disease, conf = predict_tomato_disease(IMG_PATH)
