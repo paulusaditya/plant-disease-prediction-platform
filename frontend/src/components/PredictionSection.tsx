@@ -20,32 +20,18 @@ export function PredictionSection() {
   const plantTypes = [
     "Tomat",
     "Kentang",
-    "Cabai",
+    "Apel",
     "Jagung",
     "Padi",
-    "Kedelai",
-    "Terung",
-    "Timun",
-    "Wortel",
-    "Bayam",
-    "Kangkung",
-    "Selada",
   ];
 
   // Mapping Indonesia -> Endpoint backend
   const plantMap: Record<string, string> = {
     Tomat: "tomat",
     Kentang: "kentang",
-    Cabai: "chili",
+    Apel: "apple",
     Jagung: "jagung",
     Padi: "rice",
-    Kedelai: "soybean",
-    Terung: "eggplant",
-    Timun: "cucumber",
-    Wortel: "carrot",
-    Bayam: "spinach",
-    Kangkung: "kale",
-    Selada: "lettuce",
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
