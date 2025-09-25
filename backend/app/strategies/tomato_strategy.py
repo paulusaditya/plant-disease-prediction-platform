@@ -4,10 +4,17 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.efficientnet import preprocess_input
+from huggingface_hub import hf_hub_download
 
 class TomatoStrategy:
     def __init__(self):
-        self.model = load_model("app/models/efficientnetb3-TomKit-97.94.h5")
+        # Download model dari HuggingFace
+        model_path = hf_hub_download(
+            repo_id="fariedalfarizi/Predict_Disease_Leaf_Tomato",
+            filename="efficientnetb3-TomKit-97.94.h5"  # sesuai nama file di repo HF
+        )
+        self.model = load_model(model_path)
+
         self.class_names = [
             "Bacterial_spot",
             "Early_blight",
@@ -22,15 +29,15 @@ class TomatoStrategy:
         ]
 
     def preprocess_image(self, img_bytes):
-        # Convert bytes ke numpy array
         nparr = np.frombuffer(img_bytes, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         if img is None:
             raise ValueError("Gambar tidak valid")
+
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.resize(img, self.model.input_shape[1:3])
         img = np.expand_dims(img, axis=0)
-        img = preprocess_input(img)  # Sesuai EfficientNet
+        img = preprocess_input(img)
         return img
 
     def predict(self, file):
