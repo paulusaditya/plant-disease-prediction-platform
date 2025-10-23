@@ -29,3 +29,6 @@ Thumbs.db
 *.hdf5
 *.pkl
 *.ckpt
+
+img/
+app/img/

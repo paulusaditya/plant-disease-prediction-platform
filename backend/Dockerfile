@@ -1,17 +1,18 @@
-# Gunakan image Python
-FROM python:3.10
+# Use official Python image
+FROM python:3.10-slim
 
-# Set working directory
+# Set work directory
 WORKDIR /app
 
-# Copy semua file backend ke container
-COPY . /app
-
-# Install dependensi
+# Copy requirements and install dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port default Hugging Face (7860)
+# Copy entire backend source code
+COPY . .
+
+# Expose the port used by FastAPI
 EXPOSE 7860
 
-# Jalankan FastAPI dengan uvicorn
-CMD ["uvicorn", "app.__init__:app", "--host", "0.0.0.0", "--port", "7860"]
+# Run the FastAPI app
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
