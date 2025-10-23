@@ -74,7 +74,8 @@ export function PredictionSection() {
         return;
       }
 
-      const res = await fetch(`http://127.0.0.1:8000/predict/${backendPlant}`, {
+      const API_BASE_URL = import.meta.env.VITE_API_URL;
+      const res = await fetch(`${API_BASE_URL}/predict/${backendPlant}`, {
         method: "POST",
         body: formData,
       });
