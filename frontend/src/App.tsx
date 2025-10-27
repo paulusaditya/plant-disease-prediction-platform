@@ -117,7 +117,7 @@ export default function App() {
         />
 
         {/* Contact Section */}
-        <ContactSection />
+        {/* <ContactSection /> */}
       </main>
 
       {/* Footer */}
