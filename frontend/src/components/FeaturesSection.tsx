@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { useState } from "react";
 
 export function FeaturesSection() {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const features = [
     {
@@ -113,6 +113,39 @@ export function FeaturesSection() {
               </div>
             );
           })}
+        </div>
+
+        {/* Stats Section with enhanced design */}
+        <div className="mt-24 bg-gradient-to-br from-[#2E7D32] to-[#1B5E20] rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC4xIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-30"></div>
+          
+          <div className="relative z-10">
+            <h3 className="text-2xl md:text-3xl font-bold text-white text-center mb-12">
+              Dipercaya oleh Ribuan Petani di Indonesia
+            </h3>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              {[
+                { value: "1000+", label: "Tanaman Dianalisis", icon: Leaf },
+                { value: "50+", label: "Jenis Penyakit", icon: BarChart3 },
+                { value: "95%", label: "Tingkat Akurasi", icon: CheckCircle2 },
+                { value: "24/7", label: "Tersedia Online", icon: Sparkles }
+              ].map((stat, index) => {
+                const StatIcon = stat.icon;
+                return (
+                  <div key={index} className="group">
+                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 border border-white/20">
+                      <StatIcon className="h-8 w-8 text-white/80 mx-auto mb-3 group-hover:scale-110 transition-transform duration-300" />
+                      <div className="text-4xl md:text-5xl font-bold text-white mb-2 group-hover:scale-110 transition-transform duration-300">
+                        {stat.value}
+                      </div>
+                      <div className="text-white/90 font-medium">{stat.label}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
     </section>
