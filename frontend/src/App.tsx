@@ -6,7 +6,7 @@ import { AboutSection } from "./components/AboutSection";
 import { PredictionSection } from "./components/PredictionSection";
 import { PlantsSection } from "./components/PlantsSection";
 import { ArticlesSection } from "./components/ArticlesSection";
-import { ContactSection } from "./components/ContactSection";
+// import { ContactSection } from "./components/ContactSection";
 import { Footer } from "./components/Footer";
 import { AllArticlesPage } from "./components/AllArticlesPage";
 import { ArticleDetailPage } from "./components/ArticleDetailPage";

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import {
   ArrowRight,
-  Play,
   Sparkles,
   Leaf,
   TrendingUp,
