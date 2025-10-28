@@ -20,18 +20,14 @@ export function PredictionSection() {
   const plantTypes = [
     "Tomat",
     "Kentang",
-    "Apel",
     "Jagung",
-    "Padi",
   ];
 
   // Mapping Indonesia -> Endpoint backend
   const plantMap: Record<string, string> = {
     Tomat: "tomat",
     Kentang: "kentang",
-    Apel: "apple",
     Jagung: "jagung",
-    Padi: "rice",
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
