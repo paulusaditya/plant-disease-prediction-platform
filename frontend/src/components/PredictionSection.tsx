@@ -10,6 +10,7 @@ import {
 } from "./ui/select";
 import { Progress } from "./ui/progress";
 import { Upload, Image, AlertTriangle, CheckCircle, Info } from "lucide-react";
+import { solusi } from "../api/solusi";
 
 export function PredictionSection() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -17,11 +18,7 @@ export function PredictionSection() {
   const [predictionResult, setPredictionResult] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const plantTypes = [
-    "Tomat",
-    "Kentang",
-    "Jagung",
-  ];
+  const plantTypes = ["Tomat", "Kentang", "Jagung"];
 
   // Mapping Indonesia -> Endpoint backend
   const plantMap: Record<string, string> = {
@@ -81,6 +78,12 @@ export function PredictionSection() {
       const data = await res.json();
 
       // Format hasil untuk UI
+      // Ambil solusi berdasarkan hasil AI
+      const solusiPenyakit = solusi[data.class] || {
+        saranPerawatan: ["Solusi belum tersedia"],
+        tipsPencegahan: ["Pencegahan belum tersedia"],
+      };
+
       setPredictionResult({
         disease: data.class,
         confidence: (data.confidence * 100).toFixed(2),
@@ -97,16 +100,10 @@ export function PredictionSection() {
             : data.confidence > 0.5
             ? "bg-yellow-500"
             : "bg-green-500",
-        treatment: [
-          "Gunakan fungisida sesuai dosis",
-          "Potong daun yang terinfeksi",
-          "Jaga kelembaban tanah",
-        ],
-        prevention: [
-          "Rotasi tanaman",
-          "Gunakan varietas tahan penyakit",
-          "Jaga jarak tanam",
-        ],
+
+        // ← DYNAMIC
+        treatment: solusiPenyakit.saranPerawatan,
+        prevention: solusiPenyakit.tipsPencegahan,
       });
     } catch (error) {
       console.error("Prediction failed:", error);
