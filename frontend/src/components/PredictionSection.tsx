@@ -282,7 +282,6 @@ export function PredictionSection() {
                             Tingkat Keparahan
                           </span>
 
-                          {/* Jika sehat → tampil "Sehat" */}
                           <span className="text-sm font-medium text-gray-900">
                             {predictionResult.disease === "Healthy" ||
                             predictionResult.disease === "Sehat"
@@ -303,7 +302,7 @@ export function PredictionSection() {
                               width:
                                 predictionResult.disease === "Healthy" ||
                                 predictionResult.disease === "Sehat"
-                                  ? "100%" // kalau sehat selalu full bar
+                                  ? "100%"
                                   : predictionResult.severity === "Ringan"
                                   ? "33%"
                                   : predictionResult.severity === "Sedang"
@@ -313,6 +312,7 @@ export function PredictionSection() {
                           ></div>
                         </div>
                       </div>
+                    </div>
 
 
                     {/* Treatment Recommendations */}
