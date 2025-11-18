@@ -281,17 +281,29 @@ export function PredictionSection() {
                           <span className="text-sm font-medium text-gray-600">
                             Tingkat Keparahan
                           </span>
+
+                          {/* Jika sehat → tampil "Sehat" */}
                           <span className="text-sm font-medium text-gray-900">
-                            {predictionResult.severity}
+                            {predictionResult.disease === "Healthy" ||
+                            predictionResult.disease === "Sehat"
+                              ? "Sehat"
+                              : predictionResult.severity}
                           </span>
                         </div>
+
                         <div className="w-full bg-gray-200 rounded-full h-3">
                           <div
-                            className={`h-3 rounded-full ${predictionResult.severityColor}`}
+                            className={`h-3 rounded-full ${
+                              predictionResult.disease === "Healthy" ||
+                              predictionResult.disease === "Sehat"
+                                ? "bg-green-500"
+                                : predictionResult.severityColor
+                            }`}
                             style={{
                               width:
+                                predictionResult.disease === "Healthy" ||
                                 predictionResult.disease === "Sehat"
-                                  ? "100%"
+                                  ? "100%" // kalau sehat selalu full bar
                                   : predictionResult.severity === "Ringan"
                                   ? "33%"
                                   : predictionResult.severity === "Sedang"
@@ -301,7 +313,7 @@ export function PredictionSection() {
                           ></div>
                         </div>
                       </div>
-                    </div>
+
 
                     {/* Treatment Recommendations */}
                     <div>
