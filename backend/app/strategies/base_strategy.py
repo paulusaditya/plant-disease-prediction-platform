@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
-import numpy as np
+from fastapi import UploadFile
 
-class PredictionStrategy(ABC):
+class BaseStrategy(ABC):
     @abstractmethod
-    def predict(self, image: np.ndarray):
-        """Melakukan prediksi berdasarkan gambar"""
+    async def predict(self, file: UploadFile):
         pass

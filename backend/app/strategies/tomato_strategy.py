@@ -1,20 +1,19 @@
-import os
 import cv2
 import numpy as np
-import tensorflow as tf
+from PIL import Image
+from fastapi import UploadFile
 from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.efficientnet import preprocess_input
-from huggingface_hub import hf_hub_download
 
-class TomatoStrategy:
+from app.strategies.base_strategy import BaseStrategy
+
+
+class TomatoStrategy(BaseStrategy):
     def __init__(self):
-        # Download model dari HuggingFace
-        model_path = hf_hub_download(
-            repo_id="fariedalfarizi/Predict_Disease_Leaf_Tomato",
-            filename="efficientnetb3-TomKit-97.94.h5"  # sesuai nama file di repo HF
+        self.model = load_model(
+            "app/models/efficientnetb3-TomKit-97.94.h5",
+            compile=False
         )
-        self.model = load_model(model_path)
-
         self.class_names = [
             "Bacterial_spot",
             "Early_blight",
@@ -27,28 +26,28 @@ class TomatoStrategy:
             "Target_spot",
             "Yellow_leaf_curl_virus",
         ]
+        self.input_size = (224, 224)  # sesuai EfficientNetB3
 
-    def preprocess_image(self, img_bytes):
-        nparr = np.frombuffer(img_bytes, np.uint8)
-        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        if img is None:
-            raise ValueError("Gambar tidak valid")
+    def _preprocess_image(self, file: UploadFile):
+        try:
+            image = Image.open(file.file).convert("RGB")
+            img = np.array(image)
+            img = cv2.resize(img, self.input_size)
+            img = np.expand_dims(img, axis=0)
+            img = preprocess_input(img)
+            return img
+        except Exception as e:
+            raise ValueError(f"Gagal memproses gambar: {str(e)}")
 
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img = cv2.resize(img, self.model.input_shape[1:3])
-        img = np.expand_dims(img, axis=0)
-        img = preprocess_input(img)
-        return img
-
-    def predict(self, file):
-        img_bytes = file.file.read()
-        img_array = self.preprocess_image(img_bytes)
-
+    async def predict(self, file: UploadFile):
+        img_array = self._preprocess_image(file)
         preds = self.model.predict(img_array, verbose=0)
-        class_idx = np.argmax(preds, axis=1)[0]
+
+        class_idx = int(np.argmax(preds, axis=1)[0])
         confidence = float(np.max(preds))
 
         return {
-            "class": self.class_names[class_idx],
+            "plant": "Tomato",
+            "prediction": self.class_names[class_idx],
             "confidence": confidence
         }
